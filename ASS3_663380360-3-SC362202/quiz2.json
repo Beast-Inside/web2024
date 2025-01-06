@@ -1,0 +1,119 @@
+{
+  "subjects": [
+    {
+      "name": "Chinese",
+      "questions": [
+        {
+          "question": "汉字 ‘快乐’ 的英文是什么？",
+          "options": ["Happy", "Sad", "Angry", "Lazy"],
+          "answer": 1
+        },
+        {
+          "question": "哪个句子是正确的？",
+          "options": [
+            "她每天吃饭吗？",
+            "我昨天去商店。",
+            "他们喜欢游泳吗？",
+            "这个问题太简单了。"
+          ],
+          "answer": 2
+        },
+        {
+          "question": "选择正确的拼音: '学校'",
+          "options": ["xué xia", "xué xiào", "xuě xiào", "xué xiē"],
+          "answer": 2
+        },
+        {
+          "question": "‘美丽’ 的反义词是什么？",
+          "options": ["漂亮", "丑陋", "可爱", "安静"],
+          "answer": 2
+        },
+        {
+          "question": "句子: '他每天早上跑步。' 中的动词是哪个？",
+          "options": ["他", "每天", "早上", "跑步"],
+          "answer": 4
+        },
+        {
+          "question": "‘苹果’ 的量词是什么？",
+          "options": ["只", "个", "片", "双"],
+          "answer": 2
+        },
+        {
+          "question": "选择正确的句子结构：",
+          "options": [
+            "我有三只狗。",
+            "有三只狗我。",
+            "我狗三只有。",
+            "三只狗我有。"
+          ],
+          "answer": 1
+        },
+        {
+          "question": "‘热情’ 的意思是什么？",
+          "options": ["冷漠", "热爱", "友好", "懒惰"],
+          "answer": 3
+        },
+        {
+          "question": "填空: '我喜欢喝 ___ 水。'",
+          "options": ["热", "冷", "绿", "黑"],
+          "answer": 2
+        },
+        {
+          "question": "‘看’ 的过去式是什么？",
+          "options": ["看了", "看着", "看过", "看的"],
+          "answer": 1
+        },
+        {
+          "question": "以下哪一个是动词？",
+          "options": ["吃", "快速", "蓝色", "快乐"],
+          "answer": 1
+        },
+        {
+          "question": "填空: '她昨天去了 ___ 。'",
+          "options": ["饭", "饭店", "饭盒", "饭馆"],
+          "answer": 4
+        },
+        {
+          "question": "‘好’ 的最高级形式是什么？",
+          "options": ["最好", "很好", "好的", "更好"],
+          "answer": 1
+        },
+        {
+          "question": "以下哪个是名词？",
+          "options": ["漂亮", "快乐", "音乐", "高兴"],
+          "answer": 3
+        },
+        {
+          "question": "填空: '他对 ___ 感兴趣。'",
+          "options": ["音乐", "跑步", "睡觉", "看书"],
+          "answer": 1
+        },
+        {
+          "question": "‘从不’ 的反义词是什么？",
+          "options": ["从来", "有时", "经常", "总是"],
+          "answer": 4
+        },
+        {
+          "question": "以下哪个是专有名词？",
+          "options": ["学校", "猫", "北京", "桌子"],
+          "answer": 3
+        },
+        {
+          "question": "完成俗语: '画蛇 ___ 。'",
+          "options": ["点睛", "添足", "添花", "补天"],
+          "answer": 2
+        },
+        {
+          "question": "‘漂亮’ 的同义词是什么？",
+          "options": ["丑", "美丽", "普通", "干净"],
+          "answer": 2
+        },
+        {
+          "question": "‘吃饭’ 的意思是？",
+          "options": ["Cooking", "Eating", "Sleeping", "Running"],
+          "answer": 2
+        }
+      ]
+    }
+  ]
+}
