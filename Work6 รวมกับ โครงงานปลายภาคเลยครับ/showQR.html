@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แสดง QR Code</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <style>
+        body { text-align: center; margin: 20px; }
+        #qrCode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    width: 200px; /* กำหนดขนาด */
+    height: 200px;
+}
+
+    </style>
+</head>
+<body>
+
+    <h1 id="classroomName">📖 กำลังโหลด...</h1>
+    <h3 id="questionTitle">❓ คำถาม: กำลังโหลด...</h3>
+    <h4 id="timeRemaining">⏳ เวลาที่เหลือ: คำนวณ...</h4>
+    
+    <div id="qrCode"></div>
+
+    <button class="btn btn-primary mt-3" onclick="goBack()">🔙 กลับไปหน้า Manage</button>
+
+    <script>
+        // 🔥 ตั้งค่า Firebase
+        if (!firebase.apps.length) {
+            const firebaseConfig = {
+                apiKey: "AIzaSyCsB5O8vwk_EhCmME6Zg6CqN1gVFl4eJik",
+                authDomain: "projectwebm2025.firebaseapp.com",
+                projectId: "projectwebm2025",
+                storageBucket: "projectwebm2025.appspot.com",
+                messagingSenderId: "316415805582",
+                appId: "1:316415805582:web:582b27fa7d4f8974bee1df",
+                measurementId: "G-EC8J8RGC0T"
+            };
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // 📌 ตรวจสอบการล็อกอิน
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                alert("❌ กรุณาเข้าสู่ระบบก่อนใช้งาน");
+                window.location.href = "index.html"; // 🔄 กลับไปหน้า Login
+            } else {
+                console.log("✅ ผู้ใช้ล็อกอินแล้ว:", user.email);
+                loadData(); // 🔥 โหลดข้อมูลเมื่อยืนยันว่า user ล็อกอินแล้ว
+            }
+        });
+
+        // 📌 ดึงค่าจาก URL
+        const params = new URLSearchParams(window.location.search);
+        const classroomId = params.get("classroomId");
+        const attendanceQuestionsId = params.get("attendanceQuestionsId");
+
+        if (!classroomId || !attendanceQuestionsId) {
+            alert("❌ ข้อมูลไม่ครบถ้วน!");
+            window.location.href = "index.html";
+        }
+
+        function loadData() {
+            // 📌 โหลดข้อมูลวิชา (classroom)
+            db.collection("classrooms").doc(classroomId).get().then(doc => {
+                if (doc.exists) {
+                    document.getElementById("classroomName").innerText = `📖 วิชา: ${doc.data().name}`;
+                } else {
+                    document.getElementById("classroomName").innerText = "❌ ไม่พบข้อมูลวิชา";
+                }
+            });
+
+            // 📌 โหลดข้อมูลคำถาม
+            db.collection("classrooms").doc(classroomId).collection("attendanceQuestions").doc(attendanceQuestionsId).get().then(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById("questionTitle").innerText = `❓ คำถาม: ${data.question}`;
+
+                    // ✅ คำนวณเวลาที่เหลือ
+                    if (data.createdAt && data.timeLimit) {
+                        const createdAt = data.createdAt.toDate().getTime();
+                        const endTime = createdAt + (data.timeLimit * 1000);
+
+                        function updateTimeRemaining() {
+                            const now = Date.now();
+                            const remaining = Math.max(0, endTime - now);
+                            const minutes = Math.floor(remaining / 60000);
+                            const seconds = Math.floor((remaining % 60000) / 1000);
+                            document.getElementById("timeRemaining").innerText = `⏳ เวลาที่เหลือ: ${minutes} นาที ${seconds} วินาที`;
+                            
+                            if (remaining <= 0) {
+                                document.getElementById("timeRemaining").innerText = "⏳ หมดเวลาแล้ว!";
+                            }
+                        }
+                        
+                        updateTimeRemaining();
+                        setInterval(updateTimeRemaining, 1000);
+                    }
+
+                    // ✅ แสดง QR Code
+                    new QRCode(document.getElementById("qrCode"), {
+                        text: `${classroomId}/${attendanceQuestionsId}`,
+                        width: 200,
+                        height: 200
+                    });
+
+                } else {
+                    document.getElementById("questionTitle").innerText = "❌ ไม่พบข้อมูลคำถาม";
+                }
+            });
+        }
+
+        // 🔙 ฟังก์ชันกลับไปหน้า Manage
+        function goBack() {
+            window.location.href = `manage.html?classroomId=${classroomId}`;
+        }
+
+    </script>
+
+</body>
+</html>

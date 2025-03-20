@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Classroom</title>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <!-- Vue 3 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+
+    <!-- Vuetify for Material Design -->
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.4.10/dist/vuetify.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.4.10/dist/vuetify.min.js"></script>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .full-height {
+            height: 100vh;
+        }
+
+        .card-custom {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card-custom:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: bold;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-cancel {
+            background-color: #f44336;
+            color: white;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: bold;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background-color: #d32f2f;
+        }
+
+        .form-control {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .v-divider {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+            <v-container>
+                <v-card class="pa-5 mx-auto card-custom" max-width="500">
+                    <v-card-title class="header-title text-center">
+                        <i class="fa-solid fa-chalkboard-teacher"></i> แก้ไขห้องเรียน
+                    </v-card-title>
+                    <v-divider class="mb-3"></v-divider>
+
+                    <v-alert v-if="user" type="info" class="mb-3">
+                        เข้าสู่ระบบในฐานะ: <strong>{{ user.email }}</strong>
+                    </v-alert>
+
+                    <v-text-field label="ชื่อห้องเรียน" v-model="classroom.name" required class="form-control"></v-text-field>
+                    <v-text-field label="รหัสวิชา" v-model="classroom.subjectCode" required class="form-control"></v-text-field>
+                    <v-text-field label="หมายเลขห้องเรียน" v-model="classroom.roomNumber" required class="form-control"></v-text-field>
+
+                    <v-text-field label="URL ของรูปภาพ" v-model="classroom.image" class="form-control"></v-text-field>
+                    <v-img v-if="classroom.image" :src="classroom.image" height="200px" class="mt-3"></v-img>
+
+                    <v-btn color="primary" class="btn-custom mt-3" block :disabled="!isFormValid" @click="saveClassroom">
+                        บันทึก
+                    </v-btn>
+                    <v-btn color="red lighten-1" class="btn-cancel mt-3" block @click="goBack">
+                        ยกเลิก
+                    </v-btn>
+                </v-card>
+            </v-container>
+        </v-app>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsB5O8vwk_EhCmME6Zg6CqN1gVFl4eJik",
+            authDomain: "projectwebm2025.firebaseapp.com",
+            projectId: "projectwebm2025",
+            storageBucket: "projectwebm2025.appspot.com",
+            messagingSenderId: "316415805582",
+            appId: "1:316415805582:web:582b27fa7d4f8974bee1df",
+            measurementId: "G-EC8J8RGC0T"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const { createApp, ref, computed } = Vue;
+        const vuetify = Vuetify.createVuetify();
+
+        createApp({
+            data() {
+                return {
+                    classroom: {
+                        id: null,
+                        name: '',
+                        subjectCode: '',
+                        roomNumber: '',
+                        image: '',
+                        userId: '',
+                        teacher: ''
+                    },
+                    user: null
+                };
+            },
+            computed: {
+                isFormValid() {
+                    return this.classroom.name && this.classroom.subjectCode && this.classroom.roomNumber;
+                }
+            },
+            methods: {
+                getCurrentUser() {
+                    auth.onAuthStateChanged(user => {
+                        if (user) {
+                            this.user = user;
+                            this.classroom.userId = user.uid;
+                            this.getTeacherName(user.uid);
+                        } else {
+                            alert("คุณต้องล็อกอินก่อน!");
+                            window.location.href = "login.html";
+                        }
+                    });
+                },
+                getTeacherName(uid) {
+                    db.collection('users').doc(uid).get().then(doc => {
+                        if (doc.exists) {
+                            this.classroom.teacher = doc.data().name || "ไม่ทราบชื่อ";
+                        }
+                    });
+                },
+                getClassroomData() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const classroomId = urlParams.get('id');
+
+                    if (classroomId) {
+                        db.collection('classrooms').doc(classroomId).get().then(doc => {
+                            if (doc.exists) {
+                                this.classroom = { id: doc.id, ...doc.data() };
+                            }
+                        });
+                    }
+                },
+                saveClassroom() {
+                    if (!this.user) {
+                        alert("คุณต้องล็อกอินก่อน!");
+                        return;
+                    }
+
+                    const classroomData = {
+                        name: this.classroom.name,
+                        subjectCode: this.classroom.subjectCode,
+                        roomNumber: this.classroom.roomNumber,
+                        image: this.classroom.image,
+                        userId: this.user.uid,
+                        teacher: this.classroom.teacher
+                    };
+
+                    if (this.classroom.id) {
+                        db.collection('classrooms').doc(this.classroom.id).update(classroomData).then(() => {
+                            alert("อัปเดตห้องเรียนเรียบร้อย!");
+                            this.goBack();
+                        });
+                    } else {
+                        db.collection('classrooms').add(classroomData).then(() => {
+                            alert("เพิ่มห้องเรียนเรียบร้อย!");
+                            this.goBack();
+                        });
+                    }
+                },
+                goBack() {
+                    window.location.href = "index.html";
+                }
+            },
+            mounted() {
+                this.getCurrentUser();
+                this.getClassroomData();
+            }
+        }).use(vuetify).mount("#app");
+    </script>
+</body>
+
+</html>

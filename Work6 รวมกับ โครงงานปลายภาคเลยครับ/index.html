@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Classroom Check-in</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@3.4.10/dist/vuetify.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.4.10/dist/vuetify.min.js"></script>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        @font-face {
+            font-family: hiya;
+            src: url(font/Mitr/Mitr-Light.ttf);
+        }
+
+        /* Basic reset */
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'hiya', sans-serif;
+            background-color: #fafafa;
+            /* เบาและสบายตา */
+        }
+
+        .full-height {
+            height: 100vh;
+        }
+
+        /* Background Image */
+        .login-bg {
+            background: url('https://source.unsplash.com/1600x900/?classroom') center/cover no-repeat;
+            background-size: cover;
+            filter: brightness(0.7);
+        }
+
+        /* Center content */
+        .d-flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Card Style */
+        .card-custom {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .card-custom:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Buttons */
+        .btn-custom {
+            background-color: #004d12;
+            color: white;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background-color: #006b17;
+        }
+
+        .btn-light-custom {
+            background-color: #1b66b6;
+            color: white;
+            border-radius: 8px;
+            padding: 10px;
+            padding-bottom: 30px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-light-custom:hover {
+            background-color: #004186;
+        }
+
+        /* Header Text */
+        .header-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Form and Text */
+        .form-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+
+        .v-btn {
+            padding-bottom: 30px;
+            padding: 1px;
+        }
+
+        .navbar-expand-lg {
+            background-color: #1b66b6;
+            color: white;
+            font-size: 25px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="app">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid">
+                <a>Classroom Check-in</a>
+            </div>
+        </nav>
+        <v-app>
+            <!-- Login Template -->
+            <template v-if="!user">
+                <v-container class="full-height login-bg d-flex-center">
+                    <v-card class="pa-5 text-center card-custom">
+                        <h1 class="header-title text-shadow">Welcome to Classroom Check-in</h1>
+                        <p class="mb-4">Please login to continue</p>
+                        <v-btn @click="google_login" class="btn-custom">
+                            Login with Google
+                        </v-btn>
+                    </v-card>
+                </v-container>
+            </template>
+
+
+            <!-- Status Selection Template -->
+            <template v-if="user && userStatus === null">
+                <v-container class="full-height d-flex-center">
+                    <v-card class="pa-5 text-center card-custom">
+                        <h2 class="header-title text-shadow">กรุณาเลือกสถานะของคุณ</h2>
+                        <p class="mb-4">เลือกว่าคุณเป็นอาจารย์หรือนักศึกษา</p>
+                        <v-btn color="primary" block class="mb-2" @click="setUserStatus(1)">ฉันเป็นอาจารย์</v-btn>
+                        <v-btn color="success" block @click="setUserStatus(2)">ฉันเป็นนักศึกษา</v-btn>
+                    </v-card>
+                </v-container>
+            </template>
+
+            <!-- Main Template after login -->
+            <template v-else>
+                <v-container fluid class="full-height">
+                    <v-row class="fill-height">
+                        <!-- Sidebar -->
+                        <v-col cols="12" md="3" class="pa-4" style="background-color: #f4f4f9;">
+                            <v-card class="pa-3 card-custom" elevation="3" style="text-align: center;">
+                                <v-avatar v-if="user" size="100" class="d-inline-block">
+                                    <img :src="user.photoURL" class="rounded-0"
+                                        style="width: 100px; height: 100px; object-fit: cover;" />
+                                </v-avatar>
+                                <div v-if="user" class="user-details mt-3">
+                                    <strong>{{ user.displayName }}</strong>
+                                    <p>{{ user.email }}</p>
+                                    <p>Status:
+                                        <span :class="userStatus === 1 ? 'text-blue' : 'text-green'">
+                                            {{ userStatus === 1 ? 'Teacher' : 'Student' }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <v-divider class="mt-3 mb-3"></v-divider>
+                                <v-btn v-if="userStatus === 1" class="btn-light-custom mb-2"
+                                    @click="goToCreateClassroom">
+                                    สร้างวิชาเรียน
+                                </v-btn>
+                                <v-btn class="btn-light-custom" @click="goToProfilePage()">Profile Edit</v-btn>
+
+                            </v-card>
+
+                            <v-card v-if="userStatus === 2" class="pa-3 mt-4 card-custom" elevation="2">
+                                <v-text-field v-model="classroomId" label="รหัส Classroom" outlined dense
+                                    class="form-control"></v-text-field>
+                                <v-btn color="success" block @click="joinClassroom">เข้าร่วมคลาส</v-btn>
+                            </v-card>
+
+                            <v-card-actions>
+                                <v-btn @click="google_logout" class="btn-light-custom mb-2">Logout</v-btn>
+                            </v-card-actions>
+                        </v-col>
+
+                        <!-- Main Content -->
+                        <v-col cols="12" md="9" class="pa-4">
+                            <v-container fluid>
+                                <v-row v-if="classrooms.length === 0" align="center" justify="center">
+                                    <v-col cols="12" class="text-center">
+                                        <p v-if="userStatus !== null">
+                                            {{ userStatus === 1 ? 'ไม่มีคลาสเรียนที่เปิด' : 'ไม่มีคลาสเรียนที่เข้าร่วม'
+                                            }}
+                                        </p>
+                                    </v-col>
+                                </v-row>
+
+                                <!-- Classroom Details -->
+                                <v-row v-if="classrooms.length > 0" justify="start">
+                                    <v-col v-for="classroom in classrooms" :key="classroom.id" cols="12" md="6">
+                                        <v-card class="pa-4 card-custom" elevation="2">
+                                            <v-img :src="classroom.image" height="200px"></v-img>
+                                            <v-card-title>{{ classroom.name }}</v-card-title>
+                                            <v-card-subtitle>{{ classroom.teacher }}</v-card-subtitle>
+                                            <v-card-subtitle>{{ classroom.subjectCode }}</v-card-subtitle>
+
+                                            <v-card-actions v-if="userStatus === 1">
+                                                <v-btn color="blue" @click="goToEditPage(classroom.id)">Manage</v-btn>
+                                                <v-btn color="red"
+                                                    @click="confirmDeleteClassroom(classroom.id)">Delete</v-btn>
+                                               
+                                            </v-card-actions>
+
+                                            <v-card-actions v-if="userStatus === 2">
+                                                <v-btn color="purple"
+                                                    @click="goToQuizPage(classroom.id)">Do_Quiz</v-btn>
+                                                <v-btn color="red" @click="exitClassroom(classroom.id)">Exit</v-btn>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
+
+                            </v-container>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </template>
+        </v-app>
+    </div>
+
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsB5O8vwk_EhCmME6Zg6CqN1gVFl4eJik",
+            authDomain: "projectwebm2025.firebaseapp.com",
+            projectId: "projectwebm2025",
+            storageBucket: "projectwebm2025.firebasestorage.app",
+            messagingSenderId: "316415805582",
+            appId: "1:316415805582:web:582b27fa7d4f8974bee1df",
+            measurementId: "G-EC8J8RGC0T"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const { createApp, ref } = Vue;
+        const vuetify = Vuetify.createVuetify();
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                const userRef = firebase.firestore().collection("users").doc(user.uid);
+                const userDoc = await userRef.get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+
+                    // ใช้ Vue.set() เพื่ออัปเดตค่าแบบ Reactive
+                    Vue.set(app.user, "email", userData.email || user.email);
+                    Vue.set(app.user, "displayName", userData.name || user.displayName);
+
+                    app.userStatus = userData.status || 2;
+
+                    // หรือถ้า Vue ยังไม่อัปเดตให้ใช้ $forceUpdate()
+                    app.$forceUpdate();
+                }
+
+            }
+        });
+
+
+
+        createApp({
+            data() {
+                return {
+                    user: null,
+                    userStatus: null,
+                    classrooms: [],
+                    classroomId: "",
+                };
+            },
+            methods: {
+
+                 goToQuizPage(classroomId) {
+            window.location.href = `quiz.html?classroomId=${classroomId}`;
+        },
+                async joinClassroom() {
+                    if (!this.classroomId) {
+                        alert("กรุณากรอกรหัส Classroom!");
+                        return;
+                    }
+
+                    try {
+                        const classroomRef = db.collection("classrooms").doc(this.classroomId);
+                        const doc = await classroomRef.get();
+
+                        if (!doc.exists) {
+                            alert("❌ ไม่พบห้องเรียนนี้");
+                            return;
+                        }
+
+                        console.log("✅ คลาสมีอยู่จริง:", doc.data());
+
+                        const studentData = {
+                            email: this.user.email,
+                            name: this.user.displayName,
+                            photo: this.user.photoURL,
+                            status: this.userStatus,  // ควรเป็น 2 สำหรับนักเรียน
+                            userId: this.user.uid,
+                            joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        };
+
+                        // ✅ เพิ่มข้อมูลลง classrooms/{classroomId}/students/{userId}
+                        await db.collection("classrooms")
+                            .doc(this.classroomId)
+                            .collection("students")
+                            .doc(this.user.uid)
+                            .set(studentData);
+
+                        console.log("✅ นักเรียนถูกเพิ่มเข้าสู่คลาสสำเร็จ:", studentData);
+
+                        // ✅ บันทึกใน users/{userId}/classrooms/{classroomId}
+                        await db.collection("users")
+                            .doc(this.user.uid)
+                            .collection("classrooms")
+                            .doc(this.classroomId)
+                            .set({ joinedAt: firebase.firestore.FieldValue.serverTimestamp() });
+
+                        console.log("✅ บันทึกคลาสที่เข้าร่วมสำเร็จ");
+
+                        alert("✅ เข้าร่วมคลาสสำเร็จ!");
+                        this.classroomId = ""; // เคลียร์ช่องกรอก
+                    } catch (error) {
+                        console.error("❌ เกิดข้อผิดพลาด:", error);
+                    }
+                },
+                async exitClassroom(classroomId) {
+                    if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการออกจากคลาสนี้?")) return;
+
+                    try {
+                        // ลบตัวเองออกจาก students collection ของคลาส
+                        await db.collection("classrooms")
+                            .doc(classroomId)
+                            .collection("students")
+                            .doc(this.user.uid)
+                            .delete();
+
+                        // ลบคลาสออกจาก users/{userId}/classrooms
+                        await db.collection("users")
+                            .doc(this.user.uid)
+                            .collection("classrooms")
+                            .doc(classroomId)
+                            .delete();
+
+                        console.log(`✅ ออกจากคลาส ${classroomId} สำเร็จ`);
+                        alert("✅ คุณออกจากคลาสเรียบร้อยแล้ว");
+
+                        // โหลดคลาสใหม่
+                        this.loadClassrooms();
+                    } catch (error) {
+                        console.error("❌ เกิดข้อผิดพลาดในการออกจากคลาส:", error);
+                    }
+                },
+
+
+
+
+                getUserStatus() {
+                    const userId = "your-user-id"; // ดึงจาก auth หรือ Vuex
+                    db.collection("users").doc(userId).get().then(doc => {
+                        if (doc.exists) {
+                            this.userStatus = doc.data().status;
+                        }
+                    }).catch(error => {
+                        console.error("❌ ไม่สามารถดึงสถานะผู้ใช้ได้:", error);
+                    });
+                },
+                google_login() {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    firebase.auth().signInWithPopup(provider).then(result => {
+                        console.log("✅ Login success:", result.user);
+                        this.user = result.user;
+
+                        if (this.user) {
+                            const userRef = db.collection("users").doc(this.user.uid);
+                            userRef.get().then(doc => {
+                                if (!doc.exists) {
+                                    console.log("🟡 User does not exist in Firestore, asking for status...");
+                                } else {
+                                    console.log("✅ User found in Firestore:", doc.data());
+                                    this.userStatus = doc.data().status;
+                                    this.loadClassrooms();
+                                }
+                            }).catch(error => console.error("❌ Firestore error:", error));
+                        }
+                    }).catch(error => console.error("❌ Login error:", error));
+                },
+                google_logout() {
+                    firebase.auth().signOut().then(() => {
+                        this.user = null;
+                        this.userStatus = null;
+                        this.classrooms = [];
+                    });
+                },
+                setUserStatus(status) {
+                    this.userStatus = status;
+                    db.collection('users').doc(this.user.uid).set({
+                        status: status,
+                        name: this.user.displayName,
+                        email: this.user.email,
+                        photo: this.user.photoURL
+                    }).then(() => {
+                        console.log("✅ User data saved:", status);
+                        this.loadClassrooms();
+                    }).catch(error => console.error("❌ Error saving user data:", error));
+                },
+                checkUserStatus() {
+                    if (this.user) {
+                        db.collection('users').doc(this.user.uid).get()
+                            .then(doc => {
+                                if (doc.exists) {
+                                    this.userStatus = doc.data().status;
+                                    this.loadClassrooms();
+                                } else {
+                                    this.userStatus = null;
+                                }
+                            });
+                    }
+                },
+                goToCreateClassroom() {
+                    window.location.href = 'create.html';
+                },
+                goToEditPage(classroomId) {
+                    window.location.href = `manage.html?classroomId=${classroomId}`;
+                },
+                goToProfilePage() {
+                    window.location.href = `editprofile.html`;
+                },
+                async loadClassrooms() {
+                    if (!this.user) return;
+
+                    if (this.userStatus === 1) {
+                        // 📌 ครู: เห็นเฉพาะห้องที่ตัวเองสร้าง
+                        db.collection('classrooms')
+                            .where('userId', '==', this.user.uid)
+                            .get()
+                            .then(snapshot => {
+                                this.classrooms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                            });
+                    } else if (this.userStatus === 2) {
+                        // 📌 นักเรียน: ดึงห้องจาก users/{uid}/classrooms
+                        db.collection('users')
+                            .doc(this.user.uid)
+                            .collection('classrooms') // ✅ ต้องมี 's' ให้ตรงกับที่บันทึกใน Firestore
+                            .get()
+                            .then(snapshot => {
+                                const joinedClassrooms = snapshot.docs.map(doc => doc.id);
+
+                                if (joinedClassrooms.length === 0) {
+                                    this.classrooms = []; // ไม่มีห้องที่เข้าร่วม
+                                } else {
+                                    // ✅ ป้องกันปัญหาถ้า joinedClassrooms.length > 10
+                                    const chunkSize = 10;
+                                    const classroomPromises = [];
+
+                                    for (let i = 0; i < joinedClassrooms.length; i += chunkSize) {
+                                        const chunk = joinedClassrooms.slice(i, i + chunkSize);
+                                        classroomPromises.push(
+                                            db.collection('classrooms')
+                                                .where(firebase.firestore.FieldPath.documentId(), 'in', chunk)
+                                                .get()
+                                        );
+                                    }
+
+                                    Promise.all(classroomPromises).then(results => {
+                                        this.classrooms = results.flatMap(snapshot =>
+                                            snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                                        );
+                                    });
+                                }
+                            });
+                    }
+                },
+
+                deleteClassroom(classroomId) {
+                    // ลบ Classroom จาก Firestore
+                    db.collection('classrooms').doc(classroomId).delete()
+                        .then(() => {
+                            console.log("✅ Classroom deleted:", classroomId);
+                            // อัปเดตข้อมูลในหน้าจอ
+                            this.loadClassrooms();
+                        })
+                        .catch(error => console.error("❌ Error deleting classroom:", error));
+                }
+
+
+
+
+            },
+            mounted() {
+                firebase.auth().onAuthStateChanged(user => {
+                    this.user = user;
+                    if (user) {
+                        this.checkUserStatus();
+                    }
+                });
+            },
+            watch: {
+                userStatus(newStatus) {
+                    if (this.user && newStatus !== null) {
+                        this.loadClassrooms();
+                    }
+                }
+            }
+        }).use(vuetify).mount("#app");
+    </script>
+
+</body>
+
+</html>
