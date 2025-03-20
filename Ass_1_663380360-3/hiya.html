@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>แบบทดสอบภาษา JAVA สำหรับผู้เริ่มต้น</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<style>
+    @font-face {
+        font-family: 'NotoSansThai';
+        src: url(/font/Noto_Sans_Thai/NotoSansThai-VariableFont_wdth,wght.ttf);
+    }
+
+    body {
+        font-family: 'NotoSansThai', sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .start-container {
+        background-color: #212529;
+        color: #fff;
+        padding: 2rem 3rem;
+        border-radius: 1rem;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .start-container h1 {
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+    }
+
+    .btn-custom {
+        background-color: #f8f9fa;
+        color: #212529;
+        border: none;
+        padding: 0.6rem 2rem;
+        border-radius: 2rem;
+        font-size: 1rem;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn-custom:hover {
+        background-color: #212529;
+        color: #f8f9fa;
+    }
+
+    .quiz-container {
+        background: #fff;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+    }
+
+    p {
+        padding-bottom: 20px;
+    }
+
+    .result-box {
+        margin-top: 2rem;
+        padding: 1rem;
+        background-color: #f0f8ff;
+        border-radius: 0.5rem;
+        text-align: center;
+    }
+
+    .correct {
+        color: green;
+    }
+
+    .incorrect {
+        color: red;
+    }
+</style>
+
+<body>
+    <div class="start-container" id="startBox">
+        <h1>แบบทดสอบภาษา JAVA สำหรับผู้เริ่มต้น</h1>
+        <p>แบบทดสอบนี้ถูกออกแบบมาเพื่อช่วยผู้เริ่มต้นในภาษา Java ให้สามารถเรียนรู้และทบทวนพื้นฐานของภาษาได้อย่างมีประสิทธิภาพ โดยเนื้อหาครอบคลุมหัวข้อสำคัญ เช่น การประกาศตัวแปร การเขียนโค้ดเงื่อนไข การใช้ลูป และฟังก์ชันพื้นฐานในภาษา Java</p>
+        <button class="btn btn-custom" id="btnStart">เริ่มทำแบบทดสอบ</button>
+    </div>
+
+    <div class="container" id="quizBox" style="display: none;">
+        <div class="quiz-container">
+            <h1 class="text-center mb-4">แบบทดสอบภาษา JAVA สำหรับผู้เริ่มต้น</h1>
+            <div id="quizListBox"></div>
+            <div class="text-center mt-4">
+                <button class="btn btn-custom" id="btnCheckAnswer">ตรวจคำตอบ</button>
+            </div>
+            <div id="resultBox" class="result-box" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // ซ่อน Quiz Box ไว้ก่อน
+            $("#quizBox").hide();
+
+            // เมื่อกดปุ่มเริ่มทำแบบทดสอบ
+            $("#btnStart").click(function () {
+                $("#startBox").fadeOut(function () { // ซ่อนหน้าจอเริ่มต้นด้วยเอฟเฟกต์
+                    $("#quizBox").fadeIn(); // แสดงหน้าจอแบบทดสอบ
+                    displayQuizList(); // เรียกฟังก์ชันสร้างคำถาม
+                });
+            });
+
+            // เมื่อกดปุ่มตรวจคำตอบ
+            $("#btnCheckAnswer").click(function () {
+                checkAnswers(); // เรียกฟังก์ชันตรวจคำตอบ
+            });
+        });
+
+        function displayQuizList() {
+            // สร้างรายการคำถาม
+            $("#quizListBox").html(""); // ล้างข้อมูลเก่า
+            for (var i in quizlist) {
+                displayQuiz(i, quizlist[i]);
+            }
+        }
+
+        function displayQuiz(i, q) {
+            var no = parseInt(i) + 1; // หมายเลขคำถาม
+            var optionsHTML = q.options.map(function(option, idx) {
+                return `
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="q${no}" value="${idx + 1}" id="q${no}opt${idx + 1}">
+                        <label class="form-check-label" for="q${no}opt${idx + 1}">
+                            ${idx + 1}. ${option}
+                        </label>
+                    </div>
+                `;
+            }).join("");
+
+            var quizHTML = `
+                <div class="mb-4">
+                    <h5>ข้อที่ ${no}: ${q.title}</h5>
+                    ${optionsHTML}
+                </div>
+            `;
+            
+            // แทรก HTML ลงใน quizListBox
+            $("#quizListBox").append(quizHTML);
+        }
+
+        function checkAnswers() {
+            var score = 0;
+            var total = quizlist.length;
+            var resultHTML = '';
+
+            // เช็คคำตอบที่เลือก
+            quizlist.forEach(function(q, index) {
+                var selectedOption = $(`input[name="q${index + 1}"]:checked`).val();
+                if (selectedOption == q.answer) {
+                    score++;
+                    resultHTML += `<p>ข้อที่ ${index + 1}: <span class="correct">ถูกต้อง</span></p>`;
+                    $(`#q${index + 1}opt${selectedOption}`).next().addClass('correct');
+                } else {
+                    resultHTML += `<p>ข้อที่ ${index + 1}: <span class="incorrect">ผิด</span></p>`;
+                    $(`#q${index + 1}opt${selectedOption}`).next().addClass('incorrect');
+                }
+
+                // ปิดการเลือกคำตอบ (disable radio buttons)
+                $(`input[name="q${index + 1}"]`).prop("disabled", true);
+            });
+
+            // แสดงผลคะแนนรวม
+            var resultMessage = `คุณได้ ${score} จาก ${total} คะแนน`;
+            $("#resultBox").html(resultMessage + "<hr>" + resultHTML).fadeIn();
+        }
+
+        var quizlist = [
+            {
+                "title": "ผลลัพธ์ของคำสั่ง System.out.println(\"Hello, World!\"); คืออะไร?",
+                "options": [
+                    "A. รับข้อมูลจากผู้ใช้",
+                    "B. พิมพ์ข้อความ Hello, World!",
+                    "C. เกิดข้อผิดพลาด",
+                    "D. ไม่มีอะไรเกิดขึ้น"
+                ],
+                "answer": 2
+            },
+            {
+                "title": "ตัวแปรใดใน Java ที่ใช้เก็บเลขจำนวนเต็ม?",
+                "options": [
+                    "A. int",
+                    "B. boolean",
+                    "C. float",
+                    "D. char"
+                ],
+                "answer": 1
+            },
+            {
+                "title": "ฟังก์ชันที่ใช้ในการอ่านค่าจากผู้ใช้คืออะไร?",
+                "options": [
+                    "A. System.console()",
+                    "B. System.read()",
+                    "C. Scanner.nextLine()",
+                    "D. System.input()"
+                ],
+                "answer": 3
+            },
+            {
+                "title": "ตัวดำเนินการใดที่ใช้เปรียบเทียบค่าใน Java?",
+                "options": [
+                    "A. ==",
+                    "B. =",
+                    "C. !=",
+                    "D. &&"
+                ],
+                "answer": 1
+            },
+            {
+                "title": "ชนิดข้อมูลใดที่เหมาะสำหรับเก็บตัวเลขทศนิยม?",
+                "options": [
+                    "A. int",
+                    "B. float",
+                    "C. boolean",
+                    "D. char"
+                ],
+                "answer": 2
+            },
+            {
+                "title": "คำสั่งใดใช้ในการประกาศตัวแปรใน Java?",
+                "options": [
+                    "A. let",
+                    "B. var",
+                    "C. int",
+                    "D. define"
+                ],
+                "answer": 3
+            },
+            {
+                "title": "ตัวดำเนินการใดที่ใช้ในการเพิ่มค่าทีละ 1?",
+                "options": [
+                    "A. --",
+                    "B. ++",
+                    "C. += 1",
+                    "D. *= 1"
+                ],
+                "answer": 2
+            },
+            {
+                "title": "คำสั่งใดใช้สำหรับการวนซ้ำใน Java?",
+                "options": [
+                    "A. if",
+                    "B. else",
+                    "C. while",
+                    "D. break"
+                ],
+                "answer": 3
+            },
+            {
+                "title": "อะไรคือคำสั่งที่ใช้สำหรับหยุดลูป?",
+                "options": [
+                    "A. stop",
+                    "B. end",
+                    "C. continue",
+                    "D. break"
+                ],
+                "answer": 4
+            },
+            {
+                "title": "คำสั่งใดใช้สำหรับสร้างคลาสใหม่ใน Java?",
+                "options": [
+                    "A. class",
+                    "B. new",
+                    "C. create",
+                    "D. build"
+                ],
+                "answer": 1
+            },
+            {
+                "title": "คำสั่งใดที่ใช้สร้างอ็อบเจกต์ใหม่?",
+                "options": [
+                    "A. new",
+                    "B. create",
+                    "C. object",
+                    "D. init"
+                ],
+                "answer": 1
+            },
+            {
+                "title": "เมธอดใดเป็นจุดเริ่มต้นของโปรแกรม Java?",
+                "options": [
+                    "A. run()",
+                    "B. start()",
+                    "C. main()",
+                    "D. execute()"
+                ],
+                "answer": 3
+            },
+            {
+                "title": "String ใน Java เป็นชนิดข้อมูลแบบใด?",
+                "options": [
+                    "A. Primitive",
+                    "B. Reference",
+                    "C. Value",
+                    "D. None of the above"
+                ],
+                "answer": 2
+            },
+            {
+                "title": "คำสั่งใดใช้ในการเปรียบเทียบค่าของตัวแปร?",
+                "options": [
+                    "A. compare()",
+                    "B. equals()",
+                    "C. equalsTo()",
+                    "D. compareTo()"
+                ],
+                "answer": 2
+            },
+            {
+                "title": "ตัวแปรประเภทใดที่สามารถเก็บค่าจากผู้ใช้ใน Java?",
+                "options": [
+                    "A. boolean",
+                    "B. int",
+                    "C. Scanner",
+                    "D. char"
+                ],
+                "answer": 3
+            },
+            {
+                "title": "คำสั่งใดใช้ในการแสดงผลข้อมูลบนจอใน Java?",
+                "options": [
+                    "A. System.out()",
+                    "B. println()",
+                    "C. print()",
+                    "D. System.print()"
+                ],
+                "answer": 2
+            },
+            {
+                "title": "คำสั่งใดใช้ในการวนลูปในรูปแบบที่รู้จำนวนรอบ?",
+                "options": [
+                    "A. for",
+                    "B. while",
+                    "C. do-while",
+                    "D. loop"
+                ],
+                "answer": 1
+            },
+            {
+                "title": "ตัวแปรใดที่ใช้เก็บค่าของตัวเลขทศนิยมใน Java?",
+                "options": [
+                    "A. int",
+                    "B. double",
+                    "C. boolean",
+                    "D. string"
+                ],
+                "answer": 2
+            },
+            {
+                "title": "คำสั่งใดใช้ในการประกาศการใช้งานคลาสอื่นใน Java?",
+                "options": [
+                    "A. import",
+                    "B. include",
+                    "C. require",
+                    "D. use"
+                ],
+                "answer": 1
+            },
+            {
+                "title": "การใช้คำสั่ง 'continue' จะทำให้เกิดอะไรในลูป?",
+                "options": [
+                    "A. ข้ามรอบปัจจุบันและดำเนินการกับรอบถัดไป",
+                    "B. หยุดลูปทันที",
+                    "C. กลับไปเริ่มต้นลูป",
+                    "D. ไม่มีอะไรเกิดขึ้น"
+                ],
+                "answer": 1
+            }
+        ];
+    </script>
+</body>
+</html>
