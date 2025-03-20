@@ -1,0 +1,243 @@
+<html>
+  <head>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.2/dist/aframe-extras.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/three@0.152.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="app.js"></script>
+  </head>
+  <body>
+    <a-scene inspector keyboard-shortcuts screenshot xr-mode-ui
+      device-orientation-permission-ui>
+
+      <a-assets>
+        <a-asset-item id="dragapult"
+          src="./model/pokemon_dragapult.glb"></a-asset-item>
+        <a-asset-item id="pikachu"
+          src="./model/pokemon_pikachu.glb"></a-asset-item>
+        <video id="sampleVideo" src="./video/healing_pokemon.mp4"></video>
+        <video src="./video/PC.mp4" id="sampleVideo2" preload="auto"
+          muted="true"></video>
+      </a-assets>
+
+      <a-entity gltf-model="./model/Low Poly Snorlax.glb"
+        scale="4.349 3.226 4.232" position="-12.20256 0.783 8.548"
+        rotation="-5.426 -143.678 -0.065">
+      </a-entity>
+
+      <a-entity gltf-model="./model/Low Poly Haunter.glb"
+        position="9.84876 1.10829 8.17323"
+        rotation="-11.625313663204404 140.1855837346585 1.8615398763800446"
+        scale="2.22995 1.93079 2.25189"
+        animation="property: position; to: 9.84876 1.40829 8.17323; dir: alternate; dur: 2000; loop: true; easing: easeInOutSine"></a-entity>
+
+      <a-sky color="#ECECEC" material geometry></a-sky>
+
+      <a-entity gltf-model="./model/pokemon_center.glb"
+        position="-0.01 6.102 -0.45851" scale="10.926 9.07 8.63901"></a-entity>
+
+      <a-entity gltf-model="./model/pokemon_center_scene.glb"
+        position="0 0 -0.97806"></a-entity>
+
+      <a-entity gltf-model="./model/pokemon_center_lady.glb" id="lady"
+        scale="0.33401 0.27441 0.45132" position="0 0 -4.5087"></a-entity>
+
+      <a-entity gltf-model="./model/pokemon_dragapult.glb" animation-mixer
+        position="4.8085 1.00373 -2.13916" rotation="0 -73.87202148401217 0"
+        scale="2 2 2">
+
+      </a-entity>
+
+      <a-text value="Welcome to Pokemon Center" color="black"
+        position="-4.04855 6.39916 6.09625" width="6"
+        font="https://cdn.aframe.io/fonts/Exo2Bold.fnt"
+        text="width: 13.79; color: #fffafa; alphaTest: 0.45; height: 1.58; letterSpacing: 0.76; tabSize: 7.67; whiteSpace: pre; wrapCount: 40.01; xOffset: 0.01; yOffset: -0.3"></a-text>
+
+      <a-entity id="clickableEntity" gltf-model="./model/pokemon_pikachu.glb"
+        animation-mixer position="-3.62921 -0.00525 0.2192"
+        rotation="0 40.216480598027616 0" scale="2 2 2"></a-entity>
+
+      <a-entity id="invisibleBlock" geometry="width: 1.5; depth: 1.5"
+        position="-3.46291 0.08225 2.51832"
+        material="color: transparent; opacity: 0.1" class="clickable"
+        scale="0.57799 0.63355 0.60205">
+      </a-entity>
+
+      <a-entity gltf-model="./model/Tree.glb"
+        position="19.01609 -0.26622 0.67822" scale="0.05 0.03 0.04"></a-entity>
+      <a-entity gltf-model="./model/Tree.glb"
+        position="0.20292 -0.20537 -18.20416" scale="0.05 0.03 0.04"></a-entity>
+      <a-entity gltf-model="./model/Tree.glb"
+        position="14.78292 -0.20537 -24.19799"
+        scale="0.05 0.03 0.04"></a-entity>
+      <a-entity gltf-model="./model/Tree.glb"
+        position="-17.16454 0.0416 -1.49633" scale="0.05 0.03 0.04"></a-entity>
+      <a-entity gltf-model="./model/Tree.glb"
+        position="-17.16454 -0.49564 20.58464"
+        scale="0.05 0.03 0.04"></a-entity>
+      <a-entity gltf-model="./model/Tree.glb" position="11.612 -0.02206 22.532"
+        scale="0.05 0.03 0.04"></a-entity>
+      <a-entity gltf-model="./model/Tree.glb" position="-17.12 0.00867 -24.483"
+        scale="0.05 0.03 0.04"></a-entity><a-entity
+        gltf-model="./model/Tree.glb" position="17.7228 -0.496 43.24609"
+        scale="0.05 0.03 0.04"></a-entity>
+
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="10.58295 -0.16583 7.97877" scale="1.06 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="9.17811 -0.16583 8.69839" scale="1.06 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="4.49415 -0.16583 8.80549" scale="1.06 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="3.11997 -0.16583 8.82917" scale="1.06 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="7.51776 -0.16583 8.81031" scale="1.06 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="5.91193 -0.16583 8.81207" scale="1.06 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="-10.13152 -0.22024 7.87103" scale="1 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="-8.58774 -0.29367 8.29261" scale="1 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="-7.09763 -0.2057 8.44115" scale="1 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="-5.57985 -0.1996 8.55372" scale="1 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="-4.11744 -0.18512 8.54474" scale="1 1.01 1"></a-entity>
+      <a-entity gltf-model="./model/Bush with Flowers.glb"
+        position="-2.81433 -0.2569 8.47074" scale="1 1.01 1"></a-entity>
+
+      <a-entity gltf-model="./model/Pikachu.glb"
+        position="-7.73459 0.71377 17.46451"
+        rotation="1.3212406755716783 -175.69578900348154 0.09969465635276324"
+        scale="1.35 1.1 1"></a-entity>
+      <a-entity></a-entity>
+
+      <a-entity gltf-model="./model/Eevee.glb"
+        position="10.31724 0.62031 13.40072" rotation="0 175.514 0"
+        scale="1.47 1.31 1"></a-entity>
+
+      <a-entity gltf-model="./model/Sun.glb"
+        position="11.54335 23.12854 -4.16292" scale="2.35 1.59 1.77"></a-entity>
+
+      <a-entity gltf-model="./model/Island.glb" scale="158.508 78.038 128.8546"
+        position="-0.055 -58.547 -5.57226"></a-entity>
+      <a-entity gltf-model="./model/Little Desert Town.glb"
+        position="116.93 -0.25679 -26.223"
+        scale="39.692 51.54 34.749"></a-entity>
+
+        <a-entity gltf-model="./model/old_bridge.glb" rotation="0.285 -164.206 -0.325" scale="4.71822 6.49341 5" position="78.61093 -1.68813 -9.53033"></a-entity>
+
+        <a-entity gltf-model="./model/Glurak and Grill.glb" position="110.592 1.1064 -20.102" scale="1.024 1.074 0.8" rotation="-8.681456511822233 129.44319803375072 -0.25095551426730056"></a-entity>
+
+      <a-video id="videoScreen" visible src="#sampleVideo"
+        position="0.00177 2.72883 -6.10678" width="2" height="1.25" muted="true"
+        material geometry scale="2.30601 1.89168 1.32958">
+      </a-video>
+
+      <a-camera id="player" position="-0.32 1.6 20.62" wasd-controls="1"
+        rotation="6.188 3.094 0" look-controls aframe-injected
+        data-aframe-inspector-original-camera><a-cursor></a-cursor></a-camera>
+
+      <div class="a-loader-title" style="display: none;"></div><div
+        class="a-loader-title" style="display: none;"></div>
+
+      <a-entity id="pc" geometry="width: 1.5; depth: 1.5"
+        position="1.8079 0.64695 -3.17535"
+        material="color: transparent; opacity: 0.1"
+        scale="0.3595 0.52386 0.30669">
+      </a-entity>
+      <a-video id="videoScreen1" visible src="#sampleVideo2"
+        position="1.79084 1.28849 -3.22715" width="2" height="1.25" muted="true"
+        scale="0.29455 0.43626 0.59091" material geometry>
+      </a-video>
+
+      <a-sound src="sound/1-04. Corn Dog.mp3" autoplay="true" loop="true"
+        preload="auto" position="0 2 -4" volume="0.5"></a-sound>
+
+      <a-box id="SoundBox" position="-7.79595 0.46909 17.36257"
+        color="color: transparent"
+        material="opacity: 0.0; transparent: true;"></a-box>
+      <audio id="clickSound" src="./sound/pikachu_cute.mp3"></audio>
+
+      <a-box id="SoundBox2" position="10.51495 0.41907 13.18473"
+        material="opacity: 0.0; transparent: true;">
+      </a-box>
+
+      <audio id="clickSound2" src="./sound/eevee.mp3" preload="auto"></audio>
+
+    </a-scene>
+  </body>
+
+  <script>
+    const ladyModel = document.querySelector('#lady');
+    const videoScreen = document.querySelector('#videoScreen');
+    const videoElement = document.querySelector('#sampleVideo');
+
+        ladyModel.addEventListener('click', () => {
+            videoScreen.setAttribute('visible', true);
+            videoElement.play();
+        });
+
+        videoElement.addEventListener('ended', () => {
+            videoScreen.setAttribute('visible', false);
+            videoElement.pause();
+            videoElement.currentTime = 0;
+        });
+
+
+        const player = document.querySelector('#player');
+        const invisibleBlock = document.querySelector('#invisibleBlock');
+        let isSitting = false;
+
+        invisibleBlock.addEventListener('click', () => {
+            if (!isSitting) {
+                player.setAttribute('position', '1.46291 1.08225 0.51832'); 
+                player.setAttribute('wasd-controls', 'enabled: false');
+                player.setAttribute('look-controls', 'enabled: false'); 
+                isSitting = true;
+            }
+        });
+
+        document.body.addEventListener('click', () => {
+            if (isSitting) {
+                player.setAttribute('position', '-3.46291 1.08225 2.51832');
+                player.setAttribute('wasd-controls', 'enabled: true');
+                player.setAttribute('look-controls', 'enabled: true');
+                isSitting = false;
+            }
+        });
+
+    const PcModel = document.querySelector('#pc');
+    const videoPC = document.querySelector('#videoScreen1');
+    const ElementPC = document.querySelector('#sampleVideo2');
+
+      PcModel.addEventListener('click', () => {
+      videoPC.setAttribute('visible', true);
+      ElementPC.play();
+        });
+
+        ElementPC.addEventListener('ended', () => {
+          videoPC.setAttribute('visible', false);
+          ElementPC.pause();
+          ElementPC.currentTime = 0;
+        });
+
+    const box = document.querySelector('#SoundBox');
+    const sound = document.querySelector('#clickSound');
+    box.addEventListener('click', () => {
+        sound.play();
+      });
+
+      const box2 = document.querySelector('#SoundBox2');
+      const sound2 = document.querySelector('#clickSound2');
+  
+      box2.addEventListener('click', () => {
+          sound2.play();
+      });
+  </script>
+
+</html>
